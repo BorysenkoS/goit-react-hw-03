@@ -1,6 +1,18 @@
 import css from "./ContactForm.module.css";
 
-const ContactForm = ({ handleSubmit }) => {
+const ContactForm = ({ onAdd }) => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const formElem = event.currentTarget.elements;
+
+    const name = formElem.profileName.value;
+    const number = formElem.profileNumber.value;
+
+    const profileObj = { name, number };
+
+    onAdd(profileObj);
+    event.currentTarget.reset();
+  };
   return (
     <div>
       <form onSubmit={handleSubmit} className={css.form}>
