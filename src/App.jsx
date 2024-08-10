@@ -5,10 +5,19 @@ import ContactList from "./components/ContactList/ContactList";
 import SearchBox from "./components/SearchBox/SearchBox";
 
 import { nanoid } from "nanoid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const App = () => {
-  const [users, setUsers] = useState(usersData);
+  const [users, setUsers] = useState(() => {
+    const localData = localStorage.getItem("users");
+
+    return JSON.parse(localData) ?? usersData;
+  });
+  const [filter, setFilter] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("users", JSON.stringify(users));
+  }, [users]);
 
   const addUser = (newUser) => {
     const finalProfile = {
@@ -21,12 +30,29 @@ const App = () => {
     });
   };
 
+  const deleteUser = (userId) => {
+    setUsers(users.filter((item) => item.id !== userId));
+  };
+
+  const handleFilter = (event) => {
+    const value = event.target.value;
+    setFilter(value);
+  };
+
+  const filteredUserName = users.filter((user) =>
+    user.name.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <>
       <h1>Phonebook</h1>
       <ContactForm onAdd={addUser} />
-      <SearchBox />
-      <ContactList users={users} />
+      <SearchBox filter={filter} handleFilter={handleFilter} />
+      <ContactList
+        users={users}
+        deleteUser={deleteUser}
+        filteredUserName={filteredUserName}
+      />
     </>
   );
 };
